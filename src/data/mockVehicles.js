@@ -11,7 +11,7 @@ export const MOCK_VEHICLES = [
     transmission: 'Automático PDK',
     color: 'Vermelho Carmine',
     price: 549000,
-    hidePrice: false, // Price visible to all
+    hidePrice: false, // Visible price
     featured: true,
     featuredTag: 'VIP TOP FEED',
     photos: [
@@ -20,7 +20,6 @@ export const MOCK_VEHICLES = [
       'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80'
     ],
     description: 'Porsche Macan GTS em estado impecável de zero km! Garantia de fábrica estendida até 2026. Pacote Sport Chrono, escapamento esportivo original com seletor de ronco, bancos adaptativos 18 vias com memória, teto panorâmico, faróis Matrix LED em preto.',
-    voiceAudioUrl: null,
     audioDuration: '0:28',
     audioTranscript: 'Fala pessoal! Esse Macan GTS está incrivelmente conservado, todas as revisões feitas na concessionária Stuttgart Porsche. Pneus Michelin Pilot Sport seminovos, sem nenhum risco nas rodas.',
     location: 'São Paulo, SP',
@@ -38,7 +37,7 @@ export const MOCK_VEHICLES = [
     viewsCount: 1840,
     specs: [
       'Motor 2.9 V6 Biturbo 440cv',
-      'Tracão Integral AWD',
+      'Tração Integral AWD',
       'Som Burmester 3D Surround',
       'Teto Solar Panorâmico',
       'Suspensão Pneumática Adaptativa'
@@ -145,7 +144,7 @@ export const MOCK_VEHICLES = [
     transmission: 'Automático DSG 6v',
     color: 'Branco Puro',
     price: 179900,
-    hidePrice: true,
+    hidePrice: true, // Price hidden for unauthenticated users
     featured: false,
     photos: [
       'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80',
@@ -216,5 +215,134 @@ export const MOCK_VEHICLES = [
       'Rodas Forjadas Marchesini'
     ],
     createdAt: 'Há 3 dias'
+  },
+  {
+    id: 'veh_6',
+    title: 'Jeep Compass Longitude 1.3 Turbo T270',
+    category: 'carro',
+    make: 'Jeep',
+    model: 'Compass',
+    year: '2022/2023',
+    mileage: 22000,
+    fuel: 'Flex (Gasolina/Etanol)',
+    transmission: 'Automático 6v',
+    color: 'Cinza Granite',
+    price: 139900,
+    hidePrice: false,
+    featured: true,
+    featuredTag: 'IMPULSIONADO',
+    photos: [
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'SUV de único dono, revisado na concessionária Jeep. Painel Full Digital 10.25", central multimídia 10.1" com Apple CarPlay e Android Auto sem fio, bancos em couro ecológico.',
+    audioDuration: '0:21',
+    audioTranscript: 'Olá! Sou a dona do Compass. Carro impecável de família, usado só pra viagens nos fins de semana. Manual e chave reserva intactos.',
+    location: 'Rio de Janeiro, RJ',
+    seller: {
+      id: 'user_proprietario_2',
+      name: 'Renata Oliveira',
+      username: '@renata_suv',
+      role: 'proprietario',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+      verified: false
+    },
+    likesCount: 64,
+    isLiked: false,
+    isSaved: false,
+    viewsCount: 670,
+    specs: [
+      'Motor T270 Turbo Flex 185cv',
+      'Central Multimídia 10.1" sem fio',
+      'Bancos em Couro Nobre',
+      'Ar Condicionado Dual Zone'
+    ],
+    createdAt: 'Há 4 dias'
+  },
+  {
+    id: 'veh_7',
+    title: 'Porsche 911 Carrera S (992) 3.0 Turbo',
+    category: 'carro',
+    make: 'Porsche',
+    model: '911 Carrera S',
+    year: '2021/2022',
+    mileage: 9800,
+    fuel: 'Gasolina',
+    transmission: 'PDK 8v',
+    color: 'Prata GT',
+    price: 820000,
+    hidePrice: true, // Price hidden
+    featured: true,
+    featuredTag: 'VIP TOP FEED',
+    photos: [
+      'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Icônico 911 Carrera S geração 992! Cor Prata GT com interior em couro Vermelho Bordeaux. Crono Sport Package, eixo traseiro esterçante, sistema de elevação de eixo dianteiro (Front Axle Lift).',
+    audioDuration: '0:30',
+    audioTranscript: 'Exemplar fantástico do 911 992 Carrera S. Estado de novo na Garagem 61. Aceitamos propostas à vista e trocas em clássicos.',
+    location: 'Belo Horizonte, MG',
+    seller: {
+      id: 'user_garagista_3',
+      name: 'Garagem 61 Classics & Custom',
+      username: '@garagem61',
+      role: 'garagista',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+      verified: true
+    },
+    likesCount: 245,
+    isLiked: false,
+    isSaved: true,
+    viewsCount: 2900,
+    specs: [
+      '450cv Boxer 6 Cilindros Biturbo',
+      'Front Axle Lift System',
+      'Eixo Traseiro Esterçante',
+      'Pacote Couro Total Bordeaux'
+    ],
+    createdAt: 'Há 5 dias'
+  },
+  {
+    id: 'veh_8',
+    title: 'BMW R 1250 GS Adventure HP',
+    category: 'moto',
+    make: 'BMW',
+    model: 'R 1250 GS',
+    year: '2022/2022',
+    mileage: 12500,
+    fuel: 'Gasolina',
+    transmission: 'Manual 6v c/ Shift Assistant',
+    color: 'HP Motorsport Tricolor',
+    price: 114900,
+    hidePrice: false,
+    featured: true,
+    featuredTag: 'DESTAQUE GARAGEM',
+    photos: [
+      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'A rainha das grandes viagens! Edição HP Adventure completa com conjunto de 3 baús de alumínio originais BMW, protetores de motor e carenagem, faróis auxiliares em LED e freios ABS Pro.',
+    audioDuration: '0:22',
+    audioTranscript: 'R 1250 GS Adventure com trio de baús de alumínio de fábrica. Perfeita para expedições nas Américas. Revisões na BMW Osten.',
+    location: 'Curitiba, PR',
+    seller: {
+      id: 'user_garagista_2',
+      name: 'Rota 66 Motos & Garagem',
+      username: '@rota66motos',
+      role: 'garagista',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      verified: true
+    },
+    likesCount: 112,
+    isLiked: false,
+    isSaved: true,
+    viewsCount: 1100,
+    specs: [
+      'Motor ShiftCam Boxer 136cv',
+      'Trio de Baús Alumínio Original',
+      'Tanque 30 Litros para Longas Viagens',
+      'Suspensão Eletrônica ESA Dynamic'
+    ],
+    createdAt: 'Há 6 dias'
   }
 ];

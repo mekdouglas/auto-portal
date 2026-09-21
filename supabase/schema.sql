@@ -61,18 +61,31 @@ CREATE TABLE IF NOT EXISTS public.chats (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable Row Level Security (RLS) with Public Read / Write Policies for MVP
+-- Enable Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vehicles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chats ENABLE ROW LEVEL SECURITY;
+
+-- Idempotent RLS Policies
+DROP POLICY IF EXISTS "Public read profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Public insert profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Public update profiles" ON public.profiles;
 
 CREATE POLICY "Public read profiles" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Public insert profiles" ON public.profiles FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update profiles" ON public.profiles FOR UPDATE USING (true);
 
+DROP POLICY IF EXISTS "Public read vehicles" ON public.vehicles;
+DROP POLICY IF EXISTS "Public insert vehicles" ON public.vehicles;
+DROP POLICY IF EXISTS "Public update vehicles" ON public.vehicles;
+
 CREATE POLICY "Public read vehicles" ON public.vehicles FOR SELECT USING (true);
 CREATE POLICY "Public insert vehicles" ON public.vehicles FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update vehicles" ON public.vehicles FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Public read chats" ON public.chats;
+DROP POLICY IF EXISTS "Public insert chats" ON public.chats;
+DROP POLICY IF EXISTS "Public update chats" ON public.chats;
 
 CREATE POLICY "Public read chats" ON public.chats FOR SELECT USING (true);
 CREATE POLICY "Public insert chats" ON public.chats FOR INSERT WITH CHECK (true);

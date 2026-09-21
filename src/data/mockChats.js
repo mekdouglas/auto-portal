@@ -43,7 +43,7 @@ export const MOCK_CHATS = [
           originalPrice: 549000,
           paymentType: 'À Vista PIX / Transferência',
           notes: 'Validade da proposta: 48h. Pagamento imediato.',
-          status: 'pending', // 'pending' | 'accepted' | 'rejected' | 'countered'
+          status: 'pending', // Pending status
           counterAmount: null
         },
         text: 'Proposta enviada no valor de R$ 525.000',
@@ -63,7 +63,7 @@ export const MOCK_CHATS = [
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
       role: 'proprietario'
     },
-    lastMessage: 'Proposta de R$ 132.000 foi aceita pelo vendedor!',
+    lastMessage: 'Proposta Aceita no valor de R$ 132.000!',
     lastMessageTime: 'Ontem',
     unreadCount: 0,
     messages: [
@@ -87,13 +87,87 @@ export const MOCK_CHATS = [
           id: 'off_102',
           amount: 132000,
           originalPrice: 138900,
-          paymentType: 'À Vista',
+          paymentType: 'À Vista PIX',
           notes: 'Consigo enviar o sinal hoje mesmo.',
-          status: 'accepted',
+          status: 'accepted', // Accepted status
           counterAmount: null
         },
         text: 'Proposta Aceita no valor de R$ 132.000',
         timestamp: 'Ontem 11:00'
+      }
+    ]
+  },
+  {
+    id: 'chat_3',
+    vehicleId: 'veh_4',
+    vehicleTitle: 'Volkswagen Golf GTI 2.0 TSI Mk7.5',
+    vehiclePhoto: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=400&q=80',
+    vehiclePrice: 179900,
+    participant: {
+      id: 'user_comprador_2',
+      name: 'Douglas Santos',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+      role: 'comprador'
+    },
+    lastMessage: 'Contraproposta enviada: R$ 175.000',
+    lastMessageTime: 'Há 3 horas',
+    unreadCount: 1,
+    messages: [
+      {
+        id: 'msg_301',
+        senderId: 'user_comprador_2',
+        text: 'Boa tarde Carlos! Aceita R$ 168.000 à vista no PIX hoje?',
+        timestamp: '11:20'
+      },
+      {
+        id: 'msg_302',
+        senderId: 'user_comprador_2',
+        type: 'offer',
+        offerData: {
+          id: 'off_103',
+          amount: 168000,
+          originalPrice: 179900,
+          paymentType: 'À Vista PIX',
+          notes: 'Pagamento imediato.',
+          status: 'countered', // Countered status
+          counterAmount: 175000
+        },
+        text: 'Contraproposta enviada no valor de R$ 175.000',
+        timestamp: '11:45'
+      }
+    ]
+  },
+  {
+    id: 'chat_4',
+    vehicleId: 'veh_5',
+    vehicleTitle: 'Ducati Panigale V4 S 1100cc',
+    vehiclePhoto: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=400&q=80',
+    vehiclePrice: 154900,
+    participant: {
+      id: 'user_comprador_1',
+      name: 'Mariana Costa',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+      role: 'comprador'
+    },
+    lastMessage: 'Proposta Recusada.',
+    lastMessageTime: 'Há 1 dia',
+    unreadCount: 0,
+    messages: [
+      {
+        id: 'msg_401',
+        senderId: 'user_comprador_1',
+        type: 'offer',
+        offerData: {
+          id: 'off_104',
+          amount: 135000,
+          originalPrice: 154900,
+          paymentType: 'Veículo na Troca + Diferença',
+          notes: 'Ofereço minha moto atual de R$ 40k + dinheiro.',
+          status: 'rejected', // Rejected status
+          counterAmount: null
+        },
+        text: 'Proposta Recusada',
+        timestamp: 'Ontem 16:00'
       }
     ]
   }
