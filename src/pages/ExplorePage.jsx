@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useVehicles } from '../context/VehicleContext';
 import { useAuth } from '../context/AuthContext';
-import { Lock, MapPin, Sparkles, Filter, Eye, Heart, X } from 'lucide-react';
+import { Lock, MapPin, Sparkles, Filter, Loader2, CheckCircle2 } from 'lucide-react';
 
 export const ExplorePage = () => {
   const { filteredVehicles, setSelectedVehicle, selectedCategory, setSelectedCategory, setIsFilterOpen } = useVehicles();
@@ -10,6 +10,41 @@ export const ExplorePage = () => {
   const [previewVehicle, setPreviewVehicle] = useState(null);
   const pressTimerRef = useRef(null);
   const isLongPressRef = useRef(false);
+
+  // Progressive infinite loading state
+  const [visibleCount, setVisibleCount] = useState(6);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [selectedCategory, filteredVehicles.length]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && !isLoadingMore && visibleCount < filteredVehicles.length) {
+          setIsLoadingMore(true);
+          setTimeout(() => {
+            setVisibleCount(prev => Math.min(prev + 4, filteredVehicles.length));
+            setIsLoadingMore(false);
+          }, 400);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (sentinelRef.current) {
+        observer.unobserve(sentinelRef.current);
+      }
+    };
+  }, [visibleCount, filteredVehicles.length, isLoadingMore]);
 
   const handleTouchStart = (vehicle) => {
     isLongPressRef.current = false;
@@ -27,7 +62,6 @@ export const ExplorePage = () => {
     if (previewVehicle) {
       setPreviewVehicle(null);
     } else if (!isLongPressRef.current) {
-      // Normal tap/click -> open full detail modal
       setSelectedVehicle(vehicle);
     }
   };
@@ -38,6 +72,9 @@ export const ExplorePage = () => {
     }
     setPreviewVehicle(null);
   };
+
+  const visibleVehicles = filteredVehicles.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredVehicles.length;
 
   return (
     <div className="page-container explore-page">
@@ -71,7 +108,7 @@ export const ExplorePage = () => {
       </div>
 
       <div className="explore-grid">
-        {filteredVehicles.map(vehicle => {
+        {visibleVehicles.map(vehicle => {
           const isPriceHidden = vehicle.hidePrice && !currentUser;
 
           return (
@@ -123,7 +160,25 @@ export const ExplorePage = () => {
         })}
       </div>
 
-      {/* Floating Instagram-Style Quick Preview Modal on Hold */}
+      {/* Grid Progressive Loading Spinner */}
+      {isLoadingMore && (
+        <div className="progressive-loading-box">
+          <Loader2 size={24} className="skeleton-spinner" />
+          <span>Carregando mais veículos...</span>
+        </div>
+      )}
+
+      {/* Intersection Observer Sentinel */}
+      <div ref={sentinelRef} className="scroll-sentinel" />
+
+      {!hasMore && filteredVehicles.length > 6 && (
+        <div className="feed-end-badge">
+          <CheckCircle2 size={16} className="icon-gold" />
+          <span>Fim do catálogo ({filteredVehicles.length} veículos carregados)</span>
+        </div>
+      )}
+
+      {/* Floating Preview Modal */}
       {previewVehicle && (
         <div className="quick-preview-overlay">
           <div className="quick-preview-card">

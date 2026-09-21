@@ -2213,7 +2213,104 @@ input:checked + .slider:before { transform: translateX(20px); }
   color: var(--accent-gold);
 }
 
-.preview-year-km {
-  font-size: 11px;
+/* Progressive Infinite Loading & Skeletons */
+.scroll-sentinel {
+  height: 20px;
+  width: 100%;
+}
+
+.feed-skeleton-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  animation: pulse 1.2s infinite ease-in-out alternate;
+}
+
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton-line-sm {
+  width: 120px;
+  height: 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton-media {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.skeleton-spinner {
+  animation: spin 1s linear infinite;
+  color: var(--accent-gold);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.skeleton-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-line-lg {
+  width: 70%;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton-line-md {
+  width: 40%;
+  height: 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progressive-loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  font-size: 12px;
   color: var(--text-muted);
+}
+
+.feed-end-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  margin: 10px 16px 20px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 184, 0, 0.08);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+  font-size: 12px;
+  color: var(--accent-gold);
+  font-weight: 600;
 }
