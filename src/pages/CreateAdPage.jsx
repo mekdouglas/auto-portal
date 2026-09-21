@@ -321,7 +321,7 @@ export const CreateAdPage = ({ onCancel, onSuccess }) => {
         {step === 4 && (
           <div className="wizard-step">
             <h3>4. Galeria de Fotos do Anúncio</h3>
-            <p className="step-desc">Adicione imagens em alta resolução do seu veículo.</p>
+            <p className="step-desc">Selecione fotos do seu dispositivo ou adicione URLs de imagens do veículo.</p>
 
             <div className="photo-upload-grid">
               {photos.map((url, i) => (
@@ -338,10 +338,26 @@ export const CreateAdPage = ({ onCancel, onSuccess }) => {
                 </div>
               ))}
 
-              <button type="button" className="btn-add-photo-card" onClick={handleAddPhoto}>
+              <label className="btn-add-photo-card">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    files.forEach(file => {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setPhotos(prev => [...prev, reader.result]);
+                      };
+                      reader.readAsDataURL(file);
+                    });
+                  }}
+                />
                 <Plus size={24} />
-                <span>Adicionar Foto</span>
-              </button>
+                <span>Escolher do Celular / PC</span>
+              </label>
             </div>
           </div>
         )}
