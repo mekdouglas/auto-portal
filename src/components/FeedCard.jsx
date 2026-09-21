@@ -14,7 +14,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   DollarSign,
-  Tag
+  Tag,
+  Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useVehicles } from '../context/VehicleContext';
@@ -28,6 +29,7 @@ export const FeedCard = ({ vehicle }) => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [showHeartAnim, setShowHeartAnim] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
 
   const handleDoubleTap = () => {
     if (!vehicle.isLiked) {
@@ -58,7 +60,6 @@ export const FeedCard = ({ vehicle }) => {
       return;
     }
     createOrGetChat(vehicle, currentUser);
-    // Navigation to chat page handled in app
   };
 
   const handleMakeOffer = () => {
@@ -68,6 +69,43 @@ export const FeedCard = ({ vehicle }) => {
       return;
     }
     setOfferModalVehicle(vehicle);
+  };
+
+  const handleSpeechSynthesis = () => {
+    if ('speechSynthesis' in window) {
+      if (isPlayingAudio) {
+        window.speechSynthesis.cancel();
+        setIsPlayingAudio(false);
+      } else {
+        const textToSpeak = vehicle.audioTranscript || vehicle.description;
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1.0;
+        utterance.onend = () => setIsPlayingAudio(false);
+        utterance.onerror = () => setIsPlayingAudio(false);
+        setIsPlayingAudio(true);
+        window.speechSynthesis.speak(utterance);
+      }
+    } else {
+      setIsPlayingAudio(!isPlayingAudio);
+    }
+  };
+
+  const handleShare = () => {
+    const shareUrl = window.location.href;
+    const shareText = `Confira ${vehicle.title} no AutoPortal: ${shareUrl}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: vehicle.title,
+        text: shareText,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareText);
+      setShowShareToast(true);
+      setTimeout(() => setShowShareToast(false), 2000);
+    }
   };
 
   const isPriceHidden = vehicle.hidePrice && !currentUser;
@@ -157,8 +195,12 @@ export const FeedCard = ({ vehicle }) => {
             <span className="action-count">{vehicle.likesCount}</span>
           </button>
 
-          <button className="action-btn" onClick={handleOpenChat}>
+          <button className="action-btn" onClick={handleOpenChat} title="Abrir Chat">
             <MessageCircle size={24} />
+          </button>
+
+          <button className="action-btn" onClick={handleShare} title="Compartilhar">
+            <Share2 size={22} />
           </button>
 
           <button
@@ -180,6 +222,12 @@ export const FeedCard = ({ vehicle }) => {
           </button>
         </div>
       </div>
+
+      {showShareToast && (
+        <div className="share-toast">
+          <span>Link do anúncio copiado com sucesso!</span>
+        </div>
+      )}
 
       {/* Price Section */}
       <div className="card-price-section">
@@ -216,27 +264,22 @@ export const FeedCard = ({ vehicle }) => {
           <span className="spec-pill">{vehicle.fuel}</span>
         </div>
 
-        {/* Audio Description Player if present */}
-        {vehicle.audioTranscript && (
-          <div className="audio-player-card">
-            <button
-              className="btn-play-audio"
-              onClick={() => setIsPlayingAudio(!isPlayingAudio)}
-            >
-              {isPlayingAudio ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              <span>{isPlayingAudio ? 'Pausar Áudio' : `Ouvir Áudio (${vehicle.audioDuration || '0:20'})`}</span>
-            </button>
-            <div className="audio-wave-anim">
-              <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
-              <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
-              <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
-              <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
-            </div>
-            <p className="audio-transcript-snippet">
-              "{vehicle.audioTranscript}"
-            </p>
+        {/* Audio Player with Speech Synthesis */}
+        <div className="audio-player-card">
+          <button className="btn-play-audio" onClick={handleSpeechSynthesis}>
+            {isPlayingAudio ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            <span>{isPlayingAudio ? 'Pausar Áudio' : `Ouvir Áudio / Narração (${vehicle.audioDuration || '0:20'})`}</span>
+          </button>
+          <div className="audio-wave-anim">
+            <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
+            <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
+            <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
+            <div className={`bar ${isPlayingAudio ? 'playing' : ''}`}></div>
           </div>
-        )}
+          <p className="audio-transcript-snippet">
+            "{vehicle.audioTranscript || vehicle.description}"
+          </p>
+        </div>
 
         <p className="vehicle-description">
           <strong>{vehicle.seller.name}</strong> {vehicle.description}
@@ -247,7 +290,7 @@ export const FeedCard = ({ vehicle }) => {
           onClick={() => setSelectedVehicle(vehicle)}
         >
           <Eye size={14} />
-          <span>Ver ficha técnica completa e mais fotos</span>
+          <span>Ver ficha técnica completa e fotos</span>
         </button>
       </div>
     </article>

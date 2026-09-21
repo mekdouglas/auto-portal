@@ -2088,7 +2088,20 @@ input:checked + .slider:before { transform: translateX(20px); }
   margin-top: 10px;
 }
 
-/* Animations */
+/* Toast & Animations */
+.share-toast {
+  padding: 6px 14px;
+  margin: 0 16px 8px;
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid var(--accent-green);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--accent-green);
+  font-weight: 700;
+  text-align: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
