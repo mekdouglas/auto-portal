@@ -22,6 +22,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useVehicles } from '../context/VehicleContext';
 import { useChats } from '../context/ChatContext';
+import { FinancingCalculator } from './FinancingCalculator';
 
 export const VehicleDetailModal = ({ vehicle, onClose, onOpenChat, onOpenOffer }) => {
   const { currentUser, setIsAuthModalOpen, setAuthMode } = useAuth();
@@ -160,6 +161,11 @@ export const VehicleDetailModal = ({ vehicle, onClose, onOpenChat, onOpenOffer }
                 <span>Iniciar Chat</span>
               </button>
             </div>
+
+            {/* Financing Calculator */}
+            {!isPriceHidden && (
+              <FinancingCalculator vehiclePrice={vehicle.price} />
+            )}
 
             {/* Tech Specs */}
             <div className="specs-grid">
