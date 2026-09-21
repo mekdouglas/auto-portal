@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MOCK_VEHICLES } from '../data/mockVehicles';
+import { supabase } from '../lib/supabase';
 
 const VehicleContext = createContext();
 
@@ -12,26 +13,77 @@ export const VehicleProvider = ({ children }) => {
     return MOCK_VEHICLES;
   });
 
-  const [selectedCategory, setSelectedCategory] = useState('todos'); // 'todos' | 'carro' | 'moto'
+  const [selectedCategory, setSelectedCategory] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [priceMax, setPriceMax] = useState(1000000);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [offerModalVehicle, setOfferModalVehicle] = useState(null);
 
+  // Fetch real vehicles from Supabase
+  useEffect(() => {
+    async function loadSupabaseVehicles() {
+      try {
+        const { data, error } = await supabase.from('vehicles').select('*').order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          const formatted = data.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            make: item.make,
+            model: item.model,
+            year: item.year,
+            mileage: Number(item.mileage),
+            fuel: item.fuel,
+            transmission: item.transmission,
+            color: item.color,
+            price: Number(item.price),
+            hidePrice: item.hide_price,
+            featured: item.featured,
+            featuredTag: item.featured_tag,
+            photos: item.photos || [],
+            description: item.description,
+            audioTranscript: item.audio_transcript,
+            audioDuration: item.audio_duration,
+            location: item.location,
+            seller: item.seller_data || {
+              id: item.seller_id,
+              name: 'Vendedor Supabase',
+              role: 'garagista',
+              avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
+              verified: true
+            },
+            likesCount: Number(item.likes_count || 0),
+            viewsCount: Number(item.views_count || 0),
+            specs: item.specs || [],
+            createdAt: 'Recente'
+          }));
+          setVehicles(formatted);
+        }
+      } catch (err) {
+        console.warn('Fallback to local state:', err);
+      }
+    }
+    loadSupabaseVehicles();
+  }, []);
+
   useEffect(() => {
     localStorage.setItem('autoportal_vehicles', JSON.stringify(vehicles));
   }, [vehicles]);
 
-  const toggleLike = (vehicleId) => {
+  const toggleLike = async (vehicleId) => {
     setVehicles(prev => prev.map(v => {
       if (v.id === vehicleId) {
         const isLiked = !v.isLiked;
-        return {
-          ...v,
-          isLiked,
-          likesCount: isLiked ? v.likesCount + 1 : v.likesCount - 1
-        };
+        const newCount = isLiked ? v.likesCount + 1 : v.likesCount - 1;
+
+        // Async update to Supabase
+        supabase.from('vehicles')
+          .update({ likes_count: newCount })
+          .eq('id', vehicleId)
+          .then(({ error }) => { if (error) console.warn(error); });
+
+        return { ...v, isLiked, likesCount: newCount };
       }
       return v;
     }));
@@ -46,8 +98,39 @@ export const VehicleProvider = ({ children }) => {
     }));
   };
 
-  const addVehicle = (newVehicle) => {
+  const addVehicle = async (newVehicle) => {
     setVehicles(prev => [newVehicle, ...prev]);
+
+    try {
+      await supabase.from('vehicles').insert({
+        id: newVehicle.id,
+        title: newVehicle.title,
+        category: newVehicle.category,
+        make: newVehicle.make,
+        model: newVehicle.model,
+        year: newVehicle.year,
+        mileage: newVehicle.mileage,
+        fuel: newVehicle.fuel,
+        transmission: newVehicle.transmission,
+        color: newVehicle.color,
+        price: newVehicle.price,
+        hide_price: newVehicle.hidePrice,
+        featured: newVehicle.featured,
+        featured_tag: newVehicle.featuredTag,
+        photos: newVehicle.photos,
+        description: newVehicle.description,
+        audio_transcript: newVehicle.audioTranscript,
+        audio_duration: newVehicle.audioDuration,
+        location: newVehicle.location,
+        seller_id: newVehicle.seller.id,
+        seller_data: newVehicle.seller,
+        likes_count: newVehicle.likesCount,
+        views_count: newVehicle.viewsCount,
+        specs: newVehicle.specs
+      });
+    } catch (err) {
+      console.warn('Failed to insert into Supabase:', err);
+    }
   };
 
   const filteredVehicles = vehicles.filter(v => {

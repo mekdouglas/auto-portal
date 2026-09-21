@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MOCK_CHATS } from '../data/mockChats';
+import { supabase } from '../lib/supabase';
 
 const ChatContext = createContext();
 
@@ -14,11 +15,38 @@ export const ChatProvider = ({ children }) => {
 
   const [activeChatId, setActiveChatId] = useState(null);
 
+  // Load chats from Supabase
+  useEffect(() => {
+    async function loadSupabaseChats() {
+      try {
+        const { data, error } = await supabase.from('chats').select('*');
+        if (!error && data && data.length > 0) {
+          const formatted = data.map(c => ({
+            id: c.id,
+            vehicleId: c.vehicle_id,
+            vehicleTitle: c.vehicle_title,
+            vehiclePhoto: c.vehicle_photo,
+            vehiclePrice: Number(c.vehicle_price),
+            participant: c.participant,
+            lastMessage: c.last_message,
+            lastMessageTime: c.last_message_time,
+            unreadCount: Number(c.unread_count || 0),
+            messages: c.messages || []
+          }));
+          setChats(formatted);
+        }
+      } catch (err) {
+        console.warn('Fallback to local chats state:', err);
+      }
+    }
+    loadSupabaseChats();
+  }, []);
+
   useEffect(() => {
     localStorage.setItem('autoportal_chats', JSON.stringify(chats));
   }, [chats]);
 
-  const sendMessage = (chatId, text, senderId) => {
+  const sendMessage = async (chatId, text, senderId) => {
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
@@ -31,11 +59,20 @@ export const ChatProvider = ({ children }) => {
 
     setChats(prev => prev.map(c => {
       if (c.id === chatId) {
+        const updatedMsgs = [...c.messages, newMsg];
+        
+        // Sync to Supabase
+        supabase.from('chats').update({
+          last_message: text,
+          last_message_time: timeStr,
+          messages: updatedMsgs
+        }).eq('id', chatId).then(({ error }) => { if (error) console.warn(error); });
+
         return {
           ...c,
           lastMessage: text,
           lastMessageTime: timeStr,
-          messages: [...c.messages, newMsg]
+          messages: updatedMsgs
         };
       }
       return c;
@@ -43,14 +80,12 @@ export const ChatProvider = ({ children }) => {
   };
 
   const createOrGetChat = (vehicle, currentUser) => {
-    // Check if chat for vehicle & user already exists
     const existing = chats.find(c => c.vehicleId === vehicle.id);
     if (existing) {
       setActiveChatId(existing.id);
       return existing.id;
     }
 
-    // Create new chat
     const newChatId = `chat_${Date.now()}`;
     const newChat = {
       id: newChatId,
@@ -79,6 +114,21 @@ export const ChatProvider = ({ children }) => {
 
     setChats(prev => [newChat, ...prev]);
     setActiveChatId(newChatId);
+
+    // Push to Supabase
+    supabase.from('chats').insert({
+      id: newChatId,
+      vehicle_id: vehicle.id,
+      vehicle_title: vehicle.title,
+      vehicle_photo: vehicle.photos[0],
+      vehicle_price: vehicle.price,
+      participant: newChat.participant,
+      last_message: newChat.lastMessage,
+      last_message_time: newChat.lastMessageTime,
+      unread_count: 0,
+      messages: newChat.messages
+    }).then(({ error }) => { if (error) console.warn(error); });
+
     return newChatId;
   };
 
@@ -108,11 +158,20 @@ export const ChatProvider = ({ children }) => {
 
     setChats(prev => prev.map(c => {
       if (c.id === chatId) {
+        const updatedMsgs = [...c.messages, offerMsg];
+        const lastMsgText = `Proposta enviada: R$ ${Number(offerAmount).toLocaleString('pt-BR')}`;
+
+        supabase.from('chats').update({
+          last_message: lastMsgText,
+          last_message_time: timeStr,
+          messages: updatedMsgs
+        }).eq('id', chatId).then(({ error }) => { if (error) console.warn(error); });
+
         return {
           ...c,
-          lastMessage: `Proposta enviada: R$ ${Number(offerAmount).toLocaleString('pt-BR')}`,
+          lastMessage: lastMsgText,
           lastMessageTime: timeStr,
-          messages: [...c.messages, offerMsg]
+          messages: updatedMsgs
         };
       }
       return c;
@@ -145,6 +204,12 @@ export const ChatProvider = ({ children }) => {
         if (newStatus === 'accepted') statusText = 'Proposta Aceita!';
         if (newStatus === 'rejected') statusText = 'Proposta Recusada.';
         if (newStatus === 'countered') statusText = `Contraproposta enviada: R$ ${Number(counterVal).toLocaleString('pt-BR')}`;
+
+        supabase.from('chats').update({
+          last_message: statusText,
+          last_message_time: timeStr,
+          messages: updatedMessages
+        }).eq('id', chatId).then(({ error }) => { if (error) console.warn(error); });
 
         return {
           ...c,
