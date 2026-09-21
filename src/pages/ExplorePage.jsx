@@ -1,17 +1,49 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useVehicles } from '../context/VehicleContext';
 import { useAuth } from '../context/AuthContext';
-import { Lock, Heart, MapPin, Sparkles, Filter } from 'lucide-react';
+import { Lock, MapPin, Sparkles, Filter, Eye, Heart, X } from 'lucide-react';
 
 export const ExplorePage = () => {
   const { filteredVehicles, setSelectedVehicle, selectedCategory, setSelectedCategory, setIsFilterOpen } = useVehicles();
-  const { currentUser, setIsAuthModalOpen, setAuthMode } = useAuth();
+  const { currentUser } = useAuth();
+
+  const [previewVehicle, setPreviewVehicle] = useState(null);
+  const pressTimerRef = useRef(null);
+  const isLongPressRef = useRef(false);
+
+  const handleTouchStart = (vehicle) => {
+    isLongPressRef.current = false;
+    pressTimerRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      setPreviewVehicle(vehicle);
+    }, 200);
+  };
+
+  const handleTouchEnd = (vehicle) => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+    }
+
+    if (previewVehicle) {
+      setPreviewVehicle(null);
+    } else if (!isLongPressRef.current) {
+      // Normal tap/click -> open full detail modal
+      setSelectedVehicle(vehicle);
+    }
+  };
+
+  const handleTouchCancel = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+    }
+    setPreviewVehicle(null);
+  };
 
   return (
     <div className="page-container explore-page">
       <div className="explore-header">
         <h2>Catálogo de Veículos</h2>
-        <p>Explore por fotos estilo vitrine visual</p>
+        <p>Pressione e segure qualquer foto para espiar o preview rápido</p>
 
         <div className="explore-chips-row">
           <button
@@ -46,10 +78,20 @@ export const ExplorePage = () => {
             <div
               key={vehicle.id}
               className="explore-card"
-              onClick={() => setSelectedVehicle(vehicle)}
+              onTouchStart={() => handleTouchStart(vehicle)}
+              onTouchEnd={() => handleTouchEnd(vehicle)}
+              onTouchCancel={handleTouchCancel}
+              onMouseDown={() => handleTouchStart(vehicle)}
+              onMouseUp={() => handleTouchEnd(vehicle)}
+              onMouseLeave={handleTouchCancel}
             >
               <div className="explore-img-wrapper">
-                <img src={vehicle.photos[0]} alt={vehicle.title} className="explore-img" />
+                <img
+                  src={vehicle.photos[0]}
+                  alt={vehicle.title}
+                  className="explore-img"
+                  loading="lazy"
+                />
                 <div className="explore-overlay">
                   <div className="overlay-top">
                     <span className="cat-badge">{vehicle.category === 'carro' ? 'Carro' : 'Moto'}</span>
@@ -80,6 +122,44 @@ export const ExplorePage = () => {
           );
         })}
       </div>
+
+      {/* Floating Instagram-Style Quick Preview Modal on Hold */}
+      {previewVehicle && (
+        <div className="quick-preview-overlay">
+          <div className="quick-preview-card">
+            <div className="preview-header">
+              <div className="preview-seller-info">
+                <img src={previewVehicle.seller.avatar} alt={previewVehicle.seller.name} className="preview-avatar" />
+                <div>
+                  <strong>{previewVehicle.seller.name}</strong>
+                  <span className="preview-loc">{previewVehicle.location}</span>
+                </div>
+              </div>
+              <span className="preview-pill-hint">Solte o dedo para fechar</span>
+            </div>
+
+            <div className="preview-image-container">
+              <img
+                src={previewVehicle.photos[0]}
+                alt={previewVehicle.title}
+                className="preview-scaled-img"
+              />
+            </div>
+
+            <div className="preview-footer">
+              <h4>{previewVehicle.title}</h4>
+              <div className="preview-price-row">
+                {previewVehicle.hidePrice && !currentUser ? (
+                  <span className="price-hidden-tag"><Lock size={14} /> Preço Oculto para Visitantes</span>
+                ) : (
+                  <span className="preview-price-amount">R$ {previewVehicle.price.toLocaleString('pt-BR')}</span>
+                )}
+                <span className="preview-year-km">{previewVehicle.year} • {previewVehicle.mileage.toLocaleString('pt-BR')} km</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

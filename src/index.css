@@ -2102,7 +2102,118 @@ input:checked + .slider:before { transform: translateX(20px); }
   animation: fadeIn 0.2s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+/* Quick Preview Floating Overlay for Long Press Gesture */
+.quick-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.15s ease-out;
+  pointer-events: none;
+}
+
+.quick-preview-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--accent-gold);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 184, 0, 0.2);
+  overflow: hidden;
+  pointer-events: auto;
+  animation: popScale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.preview-seller-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.preview-seller-info strong {
+  display: block;
+  font-size: 13px;
+}
+
+.preview-loc {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.preview-pill-hint {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 46, 99, 0.2);
+  color: var(--accent-red);
+  font-weight: 700;
+}
+
+.preview-image-container {
+  width: 100%;
+  max-height: 60vh;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-scaled-img {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  display: block;
+}
+
+.preview-footer {
+  padding: 14px 16px;
+  background: var(--bg-card);
+}
+
+.preview-footer h4 {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.preview-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-price-amount {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-gold);
+}
+
+.preview-year-km {
+  font-size: 11px;
+  color: var(--text-muted);
 }
