@@ -5,10 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="AutoPortal - O portal mobile-first de compra, venda e negociação de veículos com feed estilo Instagram, ditado por voz e sistema de propostas." />
+    <meta name="theme-color" content="#FFB800" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.json" />
     <title>AutoPortal | Portal de Compra & Venda de Veículos Estilo Instagram</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW reg failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>

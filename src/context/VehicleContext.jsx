@@ -20,51 +20,63 @@ export const VehicleProvider = ({ children }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [offerModalVehicle, setOfferModalVehicle] = useState(null);
 
-  // Fetch real vehicles from Supabase
-  useEffect(() => {
-    async function loadSupabaseVehicles() {
-      try {
-        const { data, error } = await supabase.from('vehicles').select('*').order('created_at', { ascending: false });
-        if (!error && data && data.length > 0) {
-          const formatted = data.map(item => ({
-            id: item.id,
-            title: item.title,
-            category: item.category,
-            make: item.make,
-            model: item.model,
-            year: item.year,
-            mileage: Number(item.mileage),
-            fuel: item.fuel,
-            transmission: item.transmission,
-            color: item.color,
-            price: Number(item.price),
-            hidePrice: item.hide_price,
-            featured: item.featured,
-            featuredTag: item.featured_tag,
-            photos: item.photos || [],
-            description: item.description,
-            audioTranscript: item.audio_transcript,
-            audioDuration: item.audio_duration,
-            location: item.location,
-            seller: item.seller_data || {
-              id: item.seller_id,
-              name: 'Vendedor Supabase',
-              role: 'garagista',
-              avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
-              verified: true
-            },
-            likesCount: Number(item.likes_count || 0),
-            viewsCount: Number(item.views_count || 0),
-            specs: item.specs || [],
-            createdAt: 'Recente'
-          }));
-          setVehicles(formatted);
-        }
-      } catch (err) {
-        console.warn('Fallback to local state:', err);
+  const fetchVehiclesFromSupabase = async () => {
+    try {
+      const { data, error } = await supabase.from('vehicles').select('*').order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        const formatted = data.map(item => ({
+          id: item.id,
+          title: item.title,
+          category: item.category,
+          make: item.make,
+          model: item.model,
+          year: item.year,
+          mileage: Number(item.mileage),
+          fuel: item.fuel,
+          transmission: item.transmission,
+          color: item.color,
+          price: Number(item.price),
+          hidePrice: item.hide_price,
+          featured: item.featured,
+          featuredTag: item.featured_tag,
+          photos: item.photos || [],
+          description: item.description,
+          audioTranscript: item.audio_transcript,
+          audioDuration: item.audio_duration,
+          location: item.location,
+          seller: item.seller_data || {
+            id: item.seller_id,
+            name: 'Vendedor Supabase',
+            role: 'garagista',
+            avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
+            verified: true
+          },
+          likesCount: Number(item.likes_count || 0),
+          viewsCount: Number(item.views_count || 0),
+          specs: item.specs || [],
+          createdAt: 'Recente'
+        }));
+        setVehicles(formatted);
       }
+    } catch (err) {
+      console.warn('Fallback to local state:', err);
     }
-    loadSupabaseVehicles();
+  };
+
+  useEffect(() => {
+    fetchVehiclesFromSupabase();
+
+    // Supabase Realtime Subscription for live updates across clients
+    const channel = supabase
+      .channel('public:vehicles')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+        fetchVehiclesFromSupabase();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -77,7 +89,6 @@ export const VehicleProvider = ({ children }) => {
         const isLiked = !v.isLiked;
         const newCount = isLiked ? v.likesCount + 1 : v.likesCount - 1;
 
-        // Async update to Supabase
         supabase.from('vehicles')
           .update({ likes_count: newCount })
           .eq('id', vehicleId)

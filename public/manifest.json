@@ -1,0 +1,17 @@
+{
+  "short_name": "AutoPortal",
+  "name": "AutoPortal - Portal de Veículos Estilo Instagram",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0A0C10",
+  "theme_color": "#FFB800",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "Portal de compra, venda e negociação de veículos com feed estilo Instagram, ditado por voz e chat de propostas."
+}

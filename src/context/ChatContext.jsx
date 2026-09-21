@@ -15,31 +15,43 @@ export const ChatProvider = ({ children }) => {
 
   const [activeChatId, setActiveChatId] = useState(null);
 
-  // Load chats from Supabase
-  useEffect(() => {
-    async function loadSupabaseChats() {
-      try {
-        const { data, error } = await supabase.from('chats').select('*');
-        if (!error && data && data.length > 0) {
-          const formatted = data.map(c => ({
-            id: c.id,
-            vehicleId: c.vehicle_id,
-            vehicleTitle: c.vehicle_title,
-            vehiclePhoto: c.vehicle_photo,
-            vehiclePrice: Number(c.vehicle_price),
-            participant: c.participant,
-            lastMessage: c.last_message,
-            lastMessageTime: c.last_message_time,
-            unreadCount: Number(c.unread_count || 0),
-            messages: c.messages || []
-          }));
-          setChats(formatted);
-        }
-      } catch (err) {
-        console.warn('Fallback to local chats state:', err);
+  const fetchChatsFromSupabase = async () => {
+    try {
+      const { data, error } = await supabase.from('chats').select('*');
+      if (!error && data && data.length > 0) {
+        const formatted = data.map(c => ({
+          id: c.id,
+          vehicleId: c.vehicle_id,
+          vehicleTitle: c.vehicle_title,
+          vehiclePhoto: c.vehicle_photo,
+          vehiclePrice: Number(c.vehicle_price),
+          participant: c.participant,
+          lastMessage: c.last_message,
+          lastMessageTime: c.last_message_time,
+          unreadCount: Number(c.unread_count || 0),
+          messages: c.messages || []
+        }));
+        setChats(formatted);
       }
+    } catch (err) {
+      console.warn('Fallback to local chats state:', err);
     }
-    loadSupabaseChats();
+  };
+
+  useEffect(() => {
+    fetchChatsFromSupabase();
+
+    // Realtime channel subscription for chats & instant offer updates
+    const channel = supabase
+      .channel('public:chats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, () => {
+        fetchChatsFromSupabase();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -61,7 +73,6 @@ export const ChatProvider = ({ children }) => {
       if (c.id === chatId) {
         const updatedMsgs = [...c.messages, newMsg];
         
-        // Sync to Supabase
         supabase.from('chats').update({
           last_message: text,
           last_message_time: timeStr,
@@ -115,7 +126,6 @@ export const ChatProvider = ({ children }) => {
     setChats(prev => [newChat, ...prev]);
     setActiveChatId(newChatId);
 
-    // Push to Supabase
     supabase.from('chats').insert({
       id: newChatId,
       vehicle_id: vehicle.id,
