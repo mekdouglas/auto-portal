@@ -16,6 +16,7 @@ import {
   Zap
 } from 'lucide-react';
 import { VoiceRecorder } from '../components/VoiceRecorder';
+import { CheckoutModal } from '../components/CheckoutModal';
 import { useAuth } from '../context/AuthContext';
 import { useVehicles } from '../context/VehicleContext';
 
@@ -24,6 +25,7 @@ export const CreateAdPage = ({ onCancel, onSuccess }) => {
   const { addVehicle } = useVehicles();
 
   const [step, setStep] = useState(1);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   // Form State
   const [category, setCategory] = useState('carro');
@@ -84,6 +86,11 @@ export const CreateAdPage = ({ onCancel, onSuccess }) => {
 
   const handleSubmitAd = (e) => {
     e.preventDefault();
+
+    if (selectedPlan !== 'gratis' && !showCheckout) {
+      setShowCheckout(true);
+      return;
+    }
 
     const newVeh = {
       id: `veh_${Date.now()}`,
@@ -436,6 +443,19 @@ export const CreateAdPage = ({ onCancel, onSuccess }) => {
           </button>
         )}
       </div>
+
+      {showCheckout && (
+        <CheckoutModal
+          itemTitle={selectedPlan === 'vip' ? 'Destaque VIP Top Feed Instagram' : 'Destaque Ouro Anúncio'}
+          price={selectedPlan === 'vip' ? 59 : 29}
+          planTag={selectedPlan === 'vip' ? 'VIP TOP FEED' : 'IMPULSIONADO'}
+          onClose={() => setShowCheckout(false)}
+          onSuccess={() => {
+            setShowCheckout(false);
+            handleSubmitAd({ preventDefault: () => {} });
+          }}
+        />
+      )}
     </div>
   );
 };
