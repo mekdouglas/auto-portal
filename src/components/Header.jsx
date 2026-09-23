@@ -27,7 +27,7 @@ export const Header = () => {
           <span className="logo-icon">🏎️</span>
           <div className="logo-text">
             <span className="logo-title">Auto<span className="accent">Portal</span></span>
-            <span className="logo-sub">Instagram Auto Catalog</span>
+            <span className="logo-sub">SEU PRÓXIMO CARRO ESTÁ AQUI</span>
           </div>
         </div>
 

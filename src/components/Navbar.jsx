@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Compass, PlusCircle, MessageSquare, User } from 'lucide-react';
+import { Home, Compass, Plus, MessageSquare, User } from 'lucide-react';
 import { useChats } from '../context/ChatContext';
 
 export const Navbar = ({ activeTab, setActiveTab, onOpenCreateAd }) => {
@@ -31,9 +31,9 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenCreateAd }) => {
         title="Anunciar Veículo"
       >
         <div className="plus-btn-inner">
-          <PlusCircle size={28} />
+          <Plus size={26} strokeWidth={3} />
         </div>
-        <span>Anunciar</span>
+        <span style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>Anunciar</span>
       </button>
 
       <button
